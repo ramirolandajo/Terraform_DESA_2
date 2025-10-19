@@ -1,39 +1,18 @@
 variable "aws_region" {
-  description = "AWS region where resources will be created."
-  type        = string
-}
-
-variable "project" {
-  description = "Project identifier used for naming and tagging."
-  type        = string
+  type    = string
+  default = "us-east-1"
 }
 
 variable "bucket_name" {
-  description = "Optional explicit S3 bucket name."
-  type        = string
-  default     = null
+  type = string
 }
 
-variable "aliases" {
-  description = "CloudFront aliases for the distribution."
-  type        = list(string)
-  default     = []
-}
-
-variable "certificate_arn" {
-  description = "ACM certificate ARN for HTTPS."
-  type        = string
-  default     = null
+variable "distribution_comment" {
+  type    = string
+  default = "Core FE Prod"
 }
 
 variable "default_root_object" {
-  description = "Default object served by CloudFront."
-  type        = string
-  default     = "index.html"
-}
-
-variable "tags" {
-  description = "Additional tags applied to resources."
-  type        = map(string)
-  default     = {}
+  type    = string
+  default = "index.html"
 }

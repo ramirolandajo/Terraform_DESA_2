@@ -1,84 +1,55 @@
-locals {
-  bucket_name = coalesce(var.bucket_name, lower(join("-", compact([
-    var.project,
-    var.environment,
-    var.module_name,
-    "frontend"
-  ]))))
+resource "aws_s3_bucket" "website" {
+  bucket = var.bucket_name
 }
 
-resource "aws_s3_bucket" "this" {
-  bucket = local.bucket_name
-
-  tags = merge(
-    {
-      "Project"     = var.project
-      "Environment" = var.environment
-      "Component"   = var.module_name
-      "ManagedBy"   = "terraform"
-    },
-    var.tags
-  )
-}
-
-resource "aws_s3_bucket_ownership_controls" "this" {
-  bucket = aws_s3_bucket.this.id
-
-  rule {
-    object_ownership = "BucketOwnerEnforced"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "this" {
-  bucket                  = aws_s3_bucket.this.id
+resource "aws_s3_bucket_public_access_block" "website" {
+  bucket                  = aws_s3_bucket.website.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
-resource "aws_cloudfront_origin_access_identity" "this" {
-  comment = "Access identity for ${local.bucket_name}"
+resource "aws_cloudfront_origin_access_identity" "website" {
+  comment = var.distribution_comment
 }
 
-resource "aws_s3_bucket_policy" "this" {
-  bucket = aws_s3_bucket.this.id
+resource "aws_s3_bucket_policy" "website" {
+  bucket = aws_s3_bucket.website.id
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = {
-          AWS = aws_cloudfront_origin_access_identity.this.iam_arn
+          AWS = aws_cloudfront_origin_access_identity.website.iam_arn
         }
         Action   = ["s3:GetObject"]
-        Resource = [
-          "${aws_s3_bucket.this.arn}/*"
-        ]
+        Resource = ["${aws_s3_bucket.website.arn}/*"]
       }
     ]
   })
 }
 
-resource "aws_cloudfront_distribution" "this" {
+resource "aws_cloudfront_distribution" "website" {
   enabled             = true
-  aliases             = var.aliases
+  comment             = var.distribution_comment
   default_root_object = var.default_root_object
 
   origin {
-    domain_name = aws_s3_bucket.this.bucket_regional_domain_name
-    origin_id   = "s3-${local.bucket_name}"
+    domain_name = aws_s3_bucket.website.bucket_regional_domain_name
+    origin_id   = "s3-${var.bucket_name}"
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.this.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.website.cloudfront_access_identity_path
     }
   }
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "s3-${local.bucket_name}"
+    target_origin_id = "s3-${var.bucket_name}"
 
     viewer_protocol_policy = "redirect-to-https"
 
@@ -98,34 +69,14 @@ resource "aws_cloudfront_distribution" "this" {
   }
 
   viewer_certificate {
-    acm_certificate_arn            = var.certificate_arn
-    ssl_support_method             = var.certificate_arn == null ? null : "sni-only"
-    minimum_protocol_version       = var.certificate_arn == null ? null : "TLSv1.2_2021"
-    cloudfront_default_certificate = var.certificate_arn == null
+    cloudfront_default_certificate = true
   }
-
-  tags = merge(
-    {
-      "Project"     = var.project
-      "Environment" = var.environment
-      "Component"   = var.module_name
-      "ManagedBy"   = "terraform"
-    },
-    var.tags
-  )
 }
 
-output "bucket_id" {
-  description = "ID of the created S3 bucket."
-  value       = aws_s3_bucket.this.id
-}
-
-output "distribution_id" {
-  description = "ID of the CloudFront distribution."
-  value       = aws_cloudfront_distribution.this.id
+output "bucket_name" {
+  value = aws_s3_bucket.website.bucket
 }
 
 output "distribution_domain_name" {
-  description = "Domain name of the CloudFront distribution."
-  value       = aws_cloudfront_distribution.this.domain_name
+  value = aws_cloudfront_distribution.website.domain_name
 }
