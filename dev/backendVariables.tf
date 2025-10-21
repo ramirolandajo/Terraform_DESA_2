@@ -1,7 +1,26 @@
 variable "env_vars_ecommerce" {
   description = "Env variables for the Ecommerce EB Backend"
   type = map(string)
-  
+}
+
+variable "env_vars_catalogue" {
+  description = "Env variables for the Catalogue EB Backend"
+  type = map(string)
+}
+
+variable "env_vars_analytics" {
+  description = "Env variables for the Analytics EB Backend"
+  type = map(string)
+}
+
+variable "env_vars_core" {
+  description = "Env variables for the Core EB Backend"
+  type = map(string)
+}
+
+variable "env_vars_middleware" {
+  description = "Env variables for the Middleware EB Backend"
+  type = map(string)
 }
 
 variable "region" {
