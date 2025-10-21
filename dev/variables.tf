@@ -1,8 +1,7 @@
-variable "env_vars" {
-  type    = map(string)
-  default = {
-    //Agregar variables de entorno
-  }
+variable "env_vars_ecommerce" {
+  description = "Env variables for the Ecommerce EB Backend"
+  type = map(string)
+  
 }
 
 variable "region" {
