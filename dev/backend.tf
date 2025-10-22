@@ -65,7 +65,7 @@ resource "aws_elastic_beanstalk_environment" "middleware-dev-env" {
   value     = "SingleInstance"
   }
   dynamic "setting" {
-    for_each = var.env_vars_ecommerce
+    for_each = var.env_vars_middleware
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
       name      = setting.key
@@ -217,7 +217,7 @@ resource "aws_elastic_beanstalk_environment" "catalogue-dev-env" {
     value     = "SingleInstance"
   }
   dynamic "setting" {
-    for_each = var.env_vars_ecommerce
+    for_each = var.env_vars_catalogue
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
       name      = setting.key
@@ -281,7 +281,7 @@ resource "aws_elastic_beanstalk_environment" "analytics-dev-env" {
   value     = "SingleInstance"
   }
   dynamic "setting" {
-    for_each = var.env_vars_ecommerce
+    for_each = var.env_vars_analytics
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
       name      = setting.key
@@ -345,7 +345,7 @@ resource "aws_elastic_beanstalk_environment" "core-dev-env" {
   value     = "SingleInstance"
   }
   dynamic "setting" {
-    for_each = var.env_vars_ecommerce
+    for_each = var.env_vars_core
     content {
       namespace = "aws:elasticbeanstalk:application:environment"
       name      = setting.key
