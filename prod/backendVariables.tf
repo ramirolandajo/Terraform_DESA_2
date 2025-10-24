@@ -1,0 +1,44 @@
+variable "env_vars_ecommerce_prod" {
+  description = "Env variables for the Ecommerce EB Backend (PROD)"
+  type = map(string)
+  sensitive = true
+}
+
+variable "env_vars_catalogue_prod" {
+  description = "Env variables for the Catalogue EB Backend (PROD)"
+  type = map(string)
+  sensitive = true
+  
+}
+
+variable "env_vars_analytics_prod" {
+  description = "Env variables for the Analytics EB Backend (PROD)"
+  type = map(string)
+  sensitive = true
+}
+
+variable "env_vars_core_prod" {
+  description = "Env variables for the Core EB Backend (PROD)"
+  type = map(string)
+  sensitive = true
+}
+
+variable "env_vars_middleware_prod" {
+  description = "Env variables for the Middleware EB Backend (PROD)"
+  type = map(string)
+  sensitive = true
+}
+
+
+variable "backend_instance_type" {
+  description = "EC2 instance type to use in EB"
+  type        = string
+  default     = "t3.micro"
+}
+
+variable "ec2_server_instance_type" {
+  description = "EC2 instance type to use in Kafka+Keycloak servers (PROD)"
+  type        = string
+  default     = "t3.small"
+}
+
