@@ -11,4 +11,8 @@ resource "aws_db_instance" "mysql" {
   deletion_protection     = false
   auto_minor_version_upgrade = true
   backup_retention_period = 0
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

@@ -4,24 +4,9 @@
 
  */
 
-# --- Data sources --- 
-data "aws_vpc" "default_vpc_3" {
-  provider = aws.admin_3
-  default = true
-}
-
-data "aws_subnets" "default_subnets_3" {
-  provider = aws.admin_3
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default_vpc_3.id]
-  }
-}
-
 locals {
   subnets_csv_3 = join(",", data.aws_subnets.default_subnets_3.ids)
 }
-
 
 // MIDDLEWARE EB BACKEND
 
@@ -340,5 +325,106 @@ resource "aws_elastic_beanstalk_application" "core-prod-app" {
 
   appversion_lifecycle {
     service_role = "arn:aws:iam::607327612461:role/aws-elasticbeanstalk-service-role"
+  }
+}
+
+# ---------------------------
+# PATCH: ECOMMERCE -> set CORE_API_URL and KAFKA_MIDDLEWARE_URL
+# ---------------------------
+resource "null_resource" "patch_ecommerce_prod_envvars" {
+  triggers = {
+    core_cname       = aws_elastic_beanstalk_environment.core-prod-env.cname
+    middleware_cname = aws_elastic_beanstalk_environment.middleware-prod-env.cname
+    env_name         = aws_elastic_beanstalk_environment.ecommerce-prod-env.name
+  }
+
+  depends_on = [
+    aws_elastic_beanstalk_environment.ecommerce-prod-env,
+    aws_elastic_beanstalk_environment.core-prod-env,
+    aws_elastic_beanstalk_environment.middleware-prod-env
+  ]
+
+  provisioner "local-exec" {
+    command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.ecommerce-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=CORE_API_URL,Value=https://${aws_elastic_beanstalk_environment.core-prod-env.cname} Namespace=aws:elasticbeanstalk:application:environment,OptionName=KAFKA_MIDDLEWARE_URL,Value=https://${aws_elastic_beanstalk_environment.middleware-prod-env.cname}"
+  }
+}
+
+# ---------------------------
+# PATCH: CATALOGUE -> set CORE_API_URL and KAFKA_MIDDLEWARE_URL
+# ---------------------------
+resource "null_resource" "patch_catalogue_prod_envvars" {
+  triggers = {
+    core_cname       = aws_elastic_beanstalk_environment.core-prod-env.cname
+    middleware_cname = aws_elastic_beanstalk_environment.middleware-prod-env.cname
+    env_name         = aws_elastic_beanstalk_environment.catalogue-prod-env.name
+  }
+
+  depends_on = [
+    aws_elastic_beanstalk_environment.catalogue-prod-env,
+    aws_elastic_beanstalk_environment.core-prod-env,
+    aws_elastic_beanstalk_environment.middleware-prod-env
+  ]
+
+  provisioner "local-exec" {
+    command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.catalogue-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=CORE_API_URL,Value=https://${aws_elastic_beanstalk_environment.core-prod-env.cname} Namespace=aws:elasticbeanstalk:application:environment,OptionName=KAFKA_MIDDLEWARE_URL,Value=https://${aws_elastic_beanstalk_environment.middleware-prod-env.cname}"
+  }
+}
+
+# ---------------------------
+# PATCH: ANALYTICS -> set CORE_API_URL and KAFKA_MIDDLEWARE_URL
+# ---------------------------
+resource "null_resource" "patch_analytics_prod_envvars" {
+  triggers = {
+    core_cname       = aws_elastic_beanstalk_environment.core-prod-env.cname
+    middleware_cname = aws_elastic_beanstalk_environment.middleware-prod-env.cname
+    env_name         = aws_elastic_beanstalk_environment.analytics-prod-env.name
+  }
+
+  depends_on = [
+    aws_elastic_beanstalk_environment.analytics-prod-env,
+    aws_elastic_beanstalk_environment.core-prod-env,
+    aws_elastic_beanstalk_environment.middleware-prod-env
+  ]
+
+  provisioner "local-exec" {
+    command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.analytics-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=CORE_API_URL,Value=https://${aws_elastic_beanstalk_environment.core-prod-env.cname} Namespace=aws:elasticbeanstalk:application:environment,OptionName=KAFKA_MIDDLEWARE_URL,Value=https://${aws_elastic_beanstalk_environment.middleware-prod-env.cname}"
+  }
+}
+
+# ---------------------------
+# PATCH: CORE -> set KAFKA_MIDDLEWARE_URL only
+# ---------------------------
+resource "null_resource" "patch_core_prod_envvars" {
+  triggers = {
+    middleware_cname = aws_elastic_beanstalk_environment.middleware-prod-env.cname
+    env_name         = aws_elastic_beanstalk_environment.core-prod-env.name
+  }
+
+  depends_on = [
+    aws_elastic_beanstalk_environment.core-prod-env,
+    aws_elastic_beanstalk_environment.middleware-prod-env
+  ]
+
+  provisioner "local-exec" {
+    command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.core-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=KAFKA_MIDDLEWARE_URL,Value=https://${aws_elastic_beanstalk_environment.middleware-prod-env.cname}"
+  }
+}
+
+# ---------------------------
+# PATCH: MIDDLEWARE -> set CORE_API_URL only
+# ---------------------------
+resource "null_resource" "patch_middleware_prod_envvars" {
+  triggers = {
+    core_cname = aws_elastic_beanstalk_environment.core-prod-env.cname
+    env_name   = aws_elastic_beanstalk_environment.middleware-prod-env.name
+  }
+
+  depends_on = [
+    aws_elastic_beanstalk_environment.middleware-prod-env,
+    aws_elastic_beanstalk_environment.core-prod-env
+  ]
+
+  provisioner "local-exec" {
+    command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.middleware-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=CORE_API_URL,Value=https://${aws_elastic_beanstalk_environment.core-prod-env.cname}"
   }
 }
