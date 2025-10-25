@@ -31,3 +31,14 @@ provider "aws" {
   }
 }
 
+
+provider "aws" {
+  alias   = "admin_3"
+  region  = var.region
+  profile = "TerraformAdmin3"
+
+  assume_role {
+    role_arn     = "arn:aws:iam::607327612461:role/TerraformAdmin3Role"
+    session_name = "tf-deploy3"
+  }
+}

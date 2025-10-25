@@ -1,5 +1,5 @@
 resource "aws_db_instance" "mysql" {
-  provider = aws.admin_2
+  provider = aws.admin_3
   identifier              = "dev-db-desarrollo2"
   engine                  = "mysql"
   instance_class          = var.db_instance_class
