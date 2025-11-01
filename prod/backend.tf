@@ -428,3 +428,20 @@ resource "null_resource" "patch_middleware_prod_envvars" {
     command = "aws elasticbeanstalk update-environment --region sa-east-1 --profile TerraformAdmin3 --environment-name ${aws_elastic_beanstalk_environment.middleware-prod-env.name} --option-settings Namespace=aws:elasticbeanstalk:application:environment,OptionName=CORE_API_URL,Value=https://${aws_elastic_beanstalk_environment.core-prod-env.cname}"
   }
 }
+
+# OUTPUT FOR CLOUDFRONT URLs
+output "ecommerce_prod_cname" {
+  value = aws_elastic_beanstalk_environment.ecommerce-prod-env.cname
+}
+
+output "catalogue_prod_cname" {
+  value = aws_elastic_beanstalk_environment.catalogue-prod-env.cname
+}
+
+output "core_prod_cname" {
+  value = aws_elastic_beanstalk_environment.core-prod-env.cname
+}
+
+output "analytics_prod_cname" {
+  value = aws_elastic_beanstalk_environment.analytics-prod-env.cname
+}

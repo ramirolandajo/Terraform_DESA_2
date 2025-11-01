@@ -13,9 +13,9 @@ resource "aws_db_instance" "mysql" {
   backup_retention_period = 0
   vpc_security_group_ids = [aws_security_group.rds_mysql.id]
   
-  lifecycle {
-    prevent_destroy = true
-  }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 # Security Group for RDS MySQL allowing access
