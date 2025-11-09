@@ -26,7 +26,7 @@ provider "aws" {
   profile = "TerraformAdmin2"
 
   assume_role {
-    role_arn     = "arn:aws:iam::426333730924:role/TerraformAdmin2"
+    role_arn     = "arn:aws:iam::426333730924:role/TerraformAdmin2Role"
     session_name = "tf-deploy2"
   }
 }
